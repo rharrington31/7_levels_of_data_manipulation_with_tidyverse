@@ -1,0 +1,193 @@
+---
+title: "Untitled"
+author: "Ryan Harrington"
+date: "7/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(here)
+library(readxl)
+library(janitor)
+library(CRplot)
+library(rpart)
+```
+
+```{r}
+so <- read_csv(here::here("Data", "survey_results_public.csv"))
+schema <- read_csv(here::here("Data", "survey_results_schema.csv"))
+happiness <- read_excel(here::here("Data", "WHR20_DataForFigure2.1.xls")) %>% 
+  janitor::clean_names()
+
+theme_set(theme_compassred())
+```
+
+## Level 1: Subsetting
+`select` & `filter`
+
+```{r}
+so_subset <- 
+  so %>% 
+  filter(!is.na(JobSat)) %>% 
+  select(Respondent, JobSat, everything(), 
+         -Ethnicity, -Gender, -Sexuality, -Trans, -SurveyEase, -SurveyLength)
+
+# MainBranch, Hobbyist, Age, Age1stCode, CompFreq, CompTotal, 
+# ConvertedComp, Country, CurrencyDesc, CurrencySymbol, 
+# DatabaseDesireNextYear, DatabaseWorkedWith, DevType, EdLevel, 
+# Employment, JobFactors, JobSeek, LanguageDesireNextYear, 
+# LanguageWorkedWith, MiscTechDesireNextYear, MiscTechWorkedWith, 
+# NEWCollabToolsDesireNextYear, NEWCollabToolsWorkedWith, NEWDevOps, 
+# NEWDevOpsImpt, NEWEdImpt, NEWJobHunt, NEWJobHuntResearch, NEWLearn, 
+# NEWOffTopic, NEWOnboardGood, NEWOtherComms, NEWOvertime, 
+# NEWPurchaseResearch, NEWPurpleLink, NEWSOSites, NEWStuck, 
+# OpSys,OrgSize, PlatformDesireNextYear, PlatformWorkedWith, 
+# PurchaseWhat, SOAccount, SOComm, SOPartFreq, SOVisitFreq, 
+# UndergradMajor, WebframeDesireNextYear, WebframeWorkedWith, 
+# WelcomeChange, WorkWeekHrs, YearsCode, YearsCodePro
+
+## Binary
+# MainBranch, Hobbyist
+```
+
+## Level 2: Transforming
+`mutate`, `summarize`, `group_by`, & `ungroup`
+
+```{r}
+so_subset %>% 
+  mutate(JobSat = ! str_detect(JobSat, "dissatisfied"))
+```
+
+```{r}
+so_subset %>% 
+  group_by(Country) %>% 
+  summarize(Avg_Hours_Work = mean(WorkWeekHrs, na.rm = T)) %>% 
+  ungroup()
+```
+
+```{r}
+so_transform <- 
+  so_subset %>% 
+  mutate(JobSat = ! str_detect(JobSat, "dissatisfied")) %>% 
+  group_by(Country) %>% 
+  mutate(Avg_Hours_Work = mean(WorkWeekHrs, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(Hours_Work_Diff = WorkWeekHrs - Avg_Hours_Work)
+```
+
+
+## Level 3: Pivoting
+`pivot_wider`, `pivot_longer`
+
+```{r}
+happiness %>% 
+  pivot_longer(cols = ladder_score:dystopia_residual,
+               names_to = "field",
+               values_to = "value") %>% 
+  ggplot(aes(x = "",
+             y = value)) +
+  geom_jitter(color = CR_cols("CR_green"),
+              alpha = 0.5) +
+  facet_wrap(~field, ncol = 6, scales = "free") +
+  labs(x = "",
+       y = "")
+
+ggsave(here::here("Visualizations", "Happiness_Distributions.png"),
+       width = 10, height = 4.5, dpi = 72)
+```
+
+
+## Level 4: Joining
+`left_join`, etc.
+
+```{r}
+so_joined <- 
+  so_transform %>% 
+  left_join(happiness, by = c("Country" = "country_name"))
+```
+
+
+## Level 5: Colwise Transforming 
+`across`
+
+```{r}
+so_joined %>% 
+  mutate(ladder_score   = scale(ladder_score),
+         social_support = scale(social_support),
+         generosity     = scale(generosity))
+```
+
+```{r}
+so_scoped <- 
+  so_joined %>% 
+  mutate(across(.cols = ladder_score:dystopia_residual, 
+                .fns = scale))
+```
+
+## Level 6: Nesting
+`nest`, `unnest`
+
+```{r}
+so_western_europe <- 
+  so_scoped %>% 
+  filter(regional_indicator == "Western Europe")
+
+so_na_anz <- 
+  so_scoped %>% 
+  filter(regional_indicator == "North America and ANZ")
+
+so_s_asia <- 
+  so_scoped %>% 
+  filter(regional_indicator == "South Asia")
+```
+
+```{r}
+so_nested <- 
+  so_scoped %>% 
+  group_by(regional_indicator) %>% 
+  nest()
+```
+
+```{r}
+so_nested %>% 
+  pluck(2, 1)
+```
+
+## Level 7: Mapping
+`map`, `map2`, and variants
+
+```{r}
+so_nested %>% 
+  mutate(row_count = map_dbl(.x = data, .f = nrow))
+```
+
+```{r}
+set.seed(605)
+
+so_nested %>% 
+  mutate(train = map(.x = data, 
+                     .f = slice_sample, 
+                     prop = .75))
+```
+
+
+```{r}
+so_mapped <- 
+  so_nested %>% 
+  mutate(train = map(.x = data, 
+                     .f = slice_sample, 
+                     prop = .75),
+         test = map2(.x = data, 
+                     .y = train, 
+                     .f = anti_join, 
+                     by = "Respondent"),
+         model = map(.x = data, 
+                     ~rpart::rpart(formula = JobSat ~ ., 
+                                   data = .x, 
+                                   minbucket = 50)))
+```
