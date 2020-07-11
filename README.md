@@ -1,0 +1,3 @@
+# 7 Levels of Data Manipulation with the Tidyverse
+
+This repository was created as a companion to this article. The `Analysis.Rmd` file contains all of the code from the article with a small amount of additional code to support the article. Data was originally from the [StackOverflow Annual Developer Survey](https://insights.stackoverflow.com/survey/) and the [2020 World Happiness Index](https://data.world/makeovermonday/2020w19-world-happiness-report-2020).
