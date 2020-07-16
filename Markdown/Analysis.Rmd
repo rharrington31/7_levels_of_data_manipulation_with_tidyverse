@@ -65,7 +65,13 @@ so_subset <-
 ```
 
 ## Level 2: Transforming
-`mutate`, `summarize`, `group_by`, & `ungroup`
+`arrange`, `mutate`, `summarize`, `group_by`, & `ungroup`
+
+```{r}
+so_subset %>% 
+  arrange(JobSat)
+```
+
 
 ```{r}
 so_subset %>% 
