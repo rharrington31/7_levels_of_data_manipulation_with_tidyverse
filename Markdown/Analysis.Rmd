@@ -1,7 +1,6 @@
 ---
-title: "Untitled"
+title: "7 Levels of Data Manipulation"
 author: "Ryan Harrington"
-date: "7/9/2020"
 output: html_document
 ---
 
