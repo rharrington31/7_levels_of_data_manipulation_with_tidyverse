@@ -44,22 +44,24 @@ so_subset <-
   select(Respondent, JobSat, everything(), 
          -Ethnicity, -Gender, -Sexuality, -Trans, -SurveyEase, -SurveyLength)
 
-# MainBranch, Hobbyist, Age, Age1stCode, CompFreq, CompTotal, 
-# ConvertedComp, Country, CurrencyDesc, CurrencySymbol, 
-# DatabaseDesireNextYear, DatabaseWorkedWith, DevType, EdLevel, 
-# Employment, JobFactors, JobSeek, LanguageDesireNextYear, 
-# LanguageWorkedWith, MiscTechDesireNextYear, MiscTechWorkedWith, 
+# MainBranch,                   Hobbyist,                 Age, 
+# Age1stCode,                   CompFreq,                 CompTotal, 
+# ConvertedComp,                Country,                  CurrencyDesc, 
+# CurrencySymbol,               DatabaseDesireNextYear,   DatabaseWorkedWith,
+# DevType,                      EdLevel,                  Employment,
+# JobFactors,                   JobSeek,                  LanguageDesireNextYear, 
+# LanguageWorkedWith,           MiscTechDesireNextYear,   MiscTechWorkedWith, 
 # NEWCollabToolsDesireNextYear, NEWCollabToolsWorkedWith, NEWDevOps, 
-# NEWDevOpsImpt, NEWEdImpt, NEWJobHunt, NEWJobHuntResearch, NEWLearn, 
-# NEWOffTopic, NEWOnboardGood, NEWOtherComms, NEWOvertime, 
-# NEWPurchaseResearch, NEWPurpleLink, NEWSOSites, NEWStuck, 
-# OpSys,OrgSize, PlatformDesireNextYear, PlatformWorkedWith, 
-# PurchaseWhat, SOAccount, SOComm, SOPartFreq, SOVisitFreq, 
-# UndergradMajor, WebframeDesireNextYear, WebframeWorkedWith, 
-# WelcomeChange, WorkWeekHrs, YearsCode, YearsCodePro
-
-## Binary
-# MainBranch, Hobbyist
+# NEWDevOpsImpt,                NEWEdImpt,                NEWJobHunt, 
+# NEWJobHuntResearch,           NEWLearn,                 NEWOffTopic,
+# NEWOnboardGood,               NEWOtherComms,            NEWOvertime, 
+# NEWPurchaseResearch,          NEWPurpleLink,            NEWSOSites, 
+# NEWStuck,                     OpSys,                    OrgSize, 
+# PlatformDesireNextYear,       PlatformWorkedWith,       PurchaseWhat,    
+# SOAccount,                    SOComm,                   SOPartFreq,
+# SOVisitFreq,                  UndergradMajor,           WebframeDesireNextYear,
+# WebframeWorkedWith,           WelcomeChange,            WorkWeekHrs,
+# YearsCode,                    YearsCodePro
 ```
 
 ## Level 2: Transforming
