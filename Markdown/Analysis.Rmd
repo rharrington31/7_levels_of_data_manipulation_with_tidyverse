@@ -88,6 +88,7 @@ so_subset %>%
 ```{r}
 so_transform <- 
   so_subset %>% 
+  arrange(JobSat) %>% 
   mutate(JobSat = ! str_detect(JobSat, "dissatisfied")) %>% 
   group_by(Country) %>% 
   mutate(Avg_Hours_Work = mean(WorkWeekHrs, na.rm = T)) %>% 
