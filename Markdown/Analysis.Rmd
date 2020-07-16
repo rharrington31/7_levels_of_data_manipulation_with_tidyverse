@@ -10,12 +10,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(tidyverse)
-library(here)
-library(readxl)
-library(janitor)
+if (! require(pacman)) install.packages("pacman")
+
+pacman::p_load(
+  tidyverse,
+  here,
+  readxl,
+  janitor,
+  rpart,
+  devtools
+)
+
+if (! require(CRplot)) devtools::install_github("compassred/CRplot")
+
 library(CRplot)
-library(rpart)
 ```
 
 ```{r}
